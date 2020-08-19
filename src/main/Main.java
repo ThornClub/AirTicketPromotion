@@ -5,7 +5,9 @@ import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -18,9 +20,8 @@ public class Main extends AirTicket{
     public static void main(String[] args) {
         try {
             //获取xml的path
-            String path = Main.class.getClassLoader().getResource("configuration.xml").getPath();
             //解析xml
-            Document document = Jsoup.parse(new File(path),"utf-8");
+            Document document = Jsoup.parse(new File("configuration.xml"),"utf-8");
             //获取机票信息
             //1.获取当前位置城市代码
             String fromcitycode = document.getElementsByTag("fromcitycode").text();
