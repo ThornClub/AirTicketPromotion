@@ -8,7 +8,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author: Thorn
@@ -117,19 +118,51 @@ public class AirTicket {
      * @param html 要解析的界面
      * @return: java.util.ArrayList<java.lang.String>
      */
-    public static ArrayList<String> ParHtml(String html){
-        ArrayList<String> value = new ArrayList<>();
+    public static Map<String, String> ParHtml(String html){
+        Map<String,String> value = new HashMap<>();
         Document parse = Jsoup.parse(html);
         Elements selected = parse.getElementsByClass("selected");
         for (Element se:selected
         ) {
             Elements span = se.getElementsByTag("span");
-            for (Element sp:span
-                 ) {
-                value.add(sp.text());
-            }
+            value.put(span.get(0).text(),span.get(1).text());
         }
         return value;
+    }
+    /**
+     * Description:〈将日期切割〉
+     * @param date ：获取的日期字符串
+     * @return: java.lang.String[]
+     */
+    public static String[] SplitDate(String date){
+        String[] allDate = date.split(",");
+        return allDate;
+    }
+    public static Ticket ParseConfiguration(String filename){
+        //获取xml的path
+        //解析xml
+        Document document = null;
+        try {
+            document = Jsoup.parse(new File(filename),"utf-8");
+            //获取机票信息
+            //1.获取当前位置城市代码
+            String fromcitycode = document.getElementsByTag("fromcitycode").text();
+            //2.获取目标位置城市代码
+            String tocitycode = document.getElementsByTag("tocitycode").text();
+            //3.获取出行日期
+            String[] dates = SplitDate(document.getElementsByTag("date").text());
+            //4.获取当前位置的中文名
+            String fromcityname = document.getElementsByTag("fromadd").text();
+            //5.获取目标位置的中文名
+            String tocityname = document.getElementsByTag("toadd").text();
+            //6.获取Server酱的key
+            String key = document.getElementsByTag("key").text();
+
+            return new Ticket(fromcitycode,tocitycode,fromcityname,tocityname,key,dates);
+        } catch (IOException e) {
+            logger.error("读取配置文件信息错误"+e.getMessage(),e);
+        }
+        return null;
     }
 
 }
